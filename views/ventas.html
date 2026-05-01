@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Ventas - Joyería</title>
+    <link rel="stylesheet" href="/static/estilo.css?v=6">
+    <link rel="stylesheet" href="/static/2doEstilo.css">
+</head>
+<body class="v-bg">
+    <!-- Navbar Dinámico Estandarizado -->
+    <nav class="navbar" id="v-navbar">
+        <div class="nav-left">
+            <div class="nav-brand">
+                <div class="nav-logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFB900" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13"/><path d="M13 3l3 6-4 13"/><path d="M2 9h20"/>
+                    </svg>
+                    <span>Joyería</span>
+                </div>
+                <button class="menu-toggle" onclick="document.getElementById('v-navbar').classList.toggle('menu-open')">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+            </div>
+
+            <div class="nav-links">
+                % if rol_usuario == 'admin':
+                    <a href="/dashboard_admin" class="nav-link">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Dashboard
+                    </a>
+                    <a href="/ventas" class="nav-link active">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> Ventas
+                    </a>
+                    <a href="/pedidos_admin" class="nav-link">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 7l7 4 7-4-7-4z"/><path d="M5 7v8l7 4 7-4V7"/><path d="M12 11v8"/></svg> Pedidos
+                    </a>
+                    <a href="/productos" class="nav-link"> <!-- Podremos rellenar luego con modulo productos real -->
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13"/><path d="M13 3l3 6-4 13"/><path d="M2 9h20"/>
+                        </svg>
+                    Productos</a>
+                    <a href="/inventario" class="nav-link active">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                    Inventario
+                    </a>
+                    <a href="/clientes" class="nav-link active">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Clientes
+                    </a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="user-info">
+                <span class="user-name" style="color:white;">Administrador</span>
+                <span class="user-role" style="color: #FFB900;">Admin(Control Sistema)</span>
+            </div>
+            <a href="/login" class="btn-salir">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Salir
+            </a>
+        </div>
+    </nav>
+
+    <div class="v-container">
+        <div class="v-header-row">
+            <div class="v-title-area">
+                <h1>Historial de Ventas</h1>
+                <p>Consulta todas las transacciones realizadas</p>
+            </div>
+            <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+                <button class="btn-nueva-venta" onclick="abrirModalVenta()" id="btn-nueva-venta">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Nueva Venta
+                </button>
+                <button class="btn-reporte" onclick="generarReporte()">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Generar Reporte
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="v-stats">
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-green">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div class="stat-value" id="stat-total-dinero">$0</div>
+                <div class="stat-label">Total Ventas</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-blue">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                </div>
+                <div class="stat-value" id="stat-transacciones">0</div>
+                <div class="stat-label">Transacciones</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-purple">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div class="stat-value" id="stat-promedio">$0</div>
+                <div class="stat-label">Promedio por Venta</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label" style="margin-bottom: 0.75rem;">Por Canal</div>
+                <div class="stat-split-row">
+                    <span>Online:</span>
+                    <span id="stat-online">0</span>
+                </div>
+                <div class="stat-split-row">
+                    <span>Tienda:</span>
+                    <span id="stat-tienda">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="v-filters">
+            <h2>
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                Filtros
+            </h2>
+            <div class="v-filters-grid">
+                <div>
+                    <label class="filter-label">Período</label>
+                    <select class="v-select" id="filtro-fecha">
+                        <option value="todos">Todas</option>
+                        <option value="hoy">Hoy</option>
+                        <option value="semana">Última semana</option>
+                        <option value="mes">Último mes</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="filter-label">Canal de Venta</label>
+                    <select class="v-select" id="filtro-tipo">
+                        <option value="todos">Todos</option>
+                        <option value="online">Online</option>
+                        <option value="tienda">Tienda Física</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="v-table-wrapper">
+            <div class="v-table-responsive">
+                <table class="v-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Canal</th>
+                            <th>Vendedor</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ventas-tbody">
+                        <!-- Llenado por JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="ventas-empty" class="empty-state" style="display: none;">
+                No se encontraron ventas con los filtros seleccionados
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════
+         MODAL: NUEVA VENTA FÍSICA
+    ════════════════════════════════════════════════════════ -->
+    <div id="modal-venta" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+        <div style="background:#1a1a2e;border:1px solid rgba(255,185,0,0.25);border-radius:16px;width:min(700px,95vw);max-height:90vh;overflow-y:auto;padding:2rem;box-shadow:0 25px 60px rgba(0,0,0,0.6);">
+
+            <!-- Header modal -->
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;">
+                <div>
+                    <h2 style="color:#FFB900;font-size:1.3rem;margin:0;display:flex;align-items:center;gap:0.5rem;">
+                        <svg width="22" height="22" fill="none" stroke="#FFB900" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                        Nueva Venta — Tienda Física
+                    </h2>
+                    <p style="color:#aaa;margin:0.25rem 0 0;font-size:0.85rem;">Registra una venta realizada en el mostrador</p>
+                    <!-- Vendedor logueado → siempre visible -->
+                    <div style="margin-top:0.6rem;display:flex;align-items:center;gap:0.5rem;">
+                        <svg width="14" height="14" fill="none" stroke="#FFB900" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <span style="color:#888;font-size:0.8rem;">Vendedor/a:</span>
+                        <span id="mv-vendedor-nombre" style="color:#FFB900;font-size:0.82rem;font-weight:600;"></span>
+                    </div>
+                </div>
+                <button onclick="cerrarModalVenta()" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:1.4rem;line-height:1;margin-top:0.2rem;">✕</button>
+            </div>
+
+            <!-- Datos cliente y pago -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
+                <div>
+                    <label style="color:#ccc;font-size:0.82rem;display:block;margin-bottom:0.4rem;">Nombre del Cliente <span style="color:#888;">(opcional)</span></label>
+                    <input id="mv-cliente" type="text" placeholder="Ej: Juan Pérez" style="width:100%;padding:0.6rem 0.85rem;background:#0f0f1a;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:0.9rem;box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="color:#ccc;font-size:0.82rem;display:block;margin-bottom:0.4rem;">Método de Pago</label>
+                    <select id="mv-metodo" style="width:100%;padding:0.6rem 0.85rem;background:#0f0f1a;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:0.9rem;box-sizing:border-box;">
+                        <option value="efectivo">Efectivo</option>
+                        <option value="qr">QR</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Selector de producto -->
+            <div style="background:rgba(255,185,0,0.04);border:1px solid rgba(255,185,0,0.15);border-radius:12px;padding:1.25rem;margin-bottom:1.25rem;">
+                <h3 style="color:#FFB900;font-size:0.95rem;margin:0 0 1rem;">Agregar Producto</h3>
+                <div style="display:grid;grid-template-columns:1fr auto auto;gap:0.75rem;align-items:end;">
+                    <div>
+                        <label style="color:#ccc;font-size:0.82rem;display:block;margin-bottom:0.4rem;">Producto</label>
+                        <select id="mv-producto" style="width:100%;padding:0.6rem 0.85rem;background:#0f0f1a;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:0.88rem;box-sizing:border-box;" onchange="actualizarInfoProducto()">
+                            <option value="">— Selecciona un producto —</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="color:#ccc;font-size:0.82rem;display:block;margin-bottom:0.4rem;">Cantidad</label>
+                        <input id="mv-cantidad" type="number" min="1" value="1" style="width:80px;padding:0.6rem 0.75rem;background:#0f0f1a;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:0.9rem;">
+                    </div>
+                    <button onclick="agregarItemVenta()" style="padding:0.65rem 1.1rem;background:#FFB900;border:none;border-radius:8px;color:#0f0f1a;font-weight:700;cursor:pointer;font-size:0.88rem;white-space:nowrap;">+ Agregar</button>
+                </div>
+                <div id="mv-info-prod" style="margin-top:0.6rem;font-size:0.8rem;color:#aaa;"></div>
+            </div>
+
+            <!-- Lista de ítems agregados -->
+            <div id="mv-items-wrapper" style="display:none;margin-bottom:1.25rem;">
+                <h3 style="color:#ccc;font-size:0.9rem;margin:0 0 0.75rem;">Productos en esta venta</h3>
+                <div style="border:1px solid rgba(255,255,255,0.08);border-radius:10px;overflow:hidden;">
+                    <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                        <thead>
+                            <tr style="background:rgba(255,255,255,0.05);">
+                                <th style="padding:0.6rem 0.75rem;text-align:left;color:#aaa;font-weight:500;">Producto</th>
+                                <th style="padding:0.6rem 0.75rem;text-align:center;color:#aaa;font-weight:500;">Cant.</th>
+                                <th style="padding:0.6rem 0.75rem;text-align:right;color:#aaa;font-weight:500;">Precio</th>
+                                <th style="padding:0.6rem 0.75rem;text-align:right;color:#aaa;font-weight:500;">Subtotal</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:center;color:#aaa;font-weight:500;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="mv-items-tbody"></tbody>
+                    </table>
+                </div>
+                <div style="display:flex;justify-content:flex-end;padding:0.75rem 0.5rem 0;">
+                    <span style="color:#FFB900;font-size:1.1rem;font-weight:700;">Total: Bs <span id="mv-total">0.00</span></span>
+                </div>
+            </div>
+
+            <!-- Sin ítems placeholder -->
+            <div id="mv-empty" style="text-align:center;padding:1.5rem;color:#555;font-size:0.88rem;margin-bottom:1.25rem;">No has agregado productos aún</div>
+
+            <!-- Botones acción (Paso 1) -->
+            <div id="mv-paso1-botones" style="display:flex;justify-content:flex-end;gap:0.75rem;">
+                <button onclick="cerrarModalVenta()" style="padding:0.65rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#ccc;cursor:pointer;">Cancelar</button>
+                <button onclick="confirmarVentaFisica()" id="mv-btn-confirmar" style="padding:0.65rem 1.75rem;background:#FFB900;border:none;border-radius:8px;color:#0f0f1a;font-weight:700;cursor:pointer;">Registrar Venta</button>
+            </div>
+
+            <!-- Error message -->
+            <div id="mv-error" style="display:none;margin-top:1rem;padding:0.75rem 1rem;background:rgba(255,70,70,0.12);border:1px solid rgba(255,70,70,0.3);border-radius:8px;color:#ff6b6b;font-size:0.88rem;"></div>
+
+            <!-- ═══ PASO 2: Post-venta → Factura Presencial ═══ -->
+            <div id="mv-paso2" style="display:none;">
+                <div style="border-top:1px solid rgba(255,255,255,0.08);margin:1.25rem 0;padding-top:1.25rem;">
+                    <!-- Confirmación éxito -->
+                    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.25rem;padding:1rem;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:10px;">
+                        <svg width="28" height="28" fill="none" stroke="#22c55e" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        <div>
+                            <div style="color:#22c55e;font-weight:700;font-size:1rem;">Venta registrada exitosamente</div>
+                            <div id="mv-confirmacion-resumen" style="color:#aaa;font-size:0.82rem;margin-top:0.2rem;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Opción factura -->
+                    <h3 style="color:#FFB900;font-size:0.95rem;margin:0 0 0.85rem;display:flex;align-items:center;gap:0.5rem;">
+                        <svg width="16" height="16" fill="none" stroke="#FFB900" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                        ¿Emitir Factura Presencial?
+                    </h3>
+                    <div style="display:flex;gap:0.75rem;align-items:center;margin-bottom:1rem;">
+                        <div style="flex:1;">
+                            <label style="color:#ccc;font-size:0.82rem;display:block;margin-bottom:0.4rem;">NIT / CI del Cliente <span style="color:#888;">(o S/N si no tiene)</span></label>
+                            <input id="mv-nit" type="text" placeholder="Ej: 1234567 o S/N" value="S/N"
+                                style="width:100%;padding:0.6rem 0.85rem;background:#0f0f1a;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:0.9rem;box-sizing:border-box;">
+                        </div>
+                        <button onclick="generarFacturaPresencial()" id="mv-btn-factura"
+                            style="margin-top:1.4rem;padding:0.65rem 1.25rem;background:linear-gradient(135deg,#6366f1,#4f46e5);border:none;border-radius:8px;color:#fff;font-weight:700;cursor:pointer;font-size:0.88rem;white-space:nowrap;display:flex;align-items:center;gap:0.4rem;">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Generar PDF
+                        </button>
+                    </div>
+                    <div style="display:flex;justify-content:flex-end;">
+                        <button onclick="omitirFactura()" style="padding:0.6rem 1.5rem;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#aaa;cursor:pointer;font-size:0.85rem;">Omitir y cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario invisible para enviar datos de reporte -->
+    <form id="report-form" action="/ventas/reporte" method="POST" target="_blank">
+        <!-- El json se inyecta aqui -->
+    </form>
+
+    <style>
+        .btn-nueva-venta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.25rem;
+            background: linear-gradient(135deg, #FFB900, #e09c00);
+            border: none;
+            border-radius: 10px;
+            color: #0f0f1a;
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(255,185,0,0.3);
+        }
+        .btn-nueva-venta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,185,0,0.45);
+        }
+        #modal-venta input:focus, #modal-venta select:focus {
+            outline: none;
+            border-color: rgba(255,185,0,0.5);
+        }
+        .mv-quitar-btn {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+        .mv-quitar-btn:hover { background: rgba(255,70,70,0.15); }
+    </style>
+
+    <script>
+        const RAW_VENTAS    = {{!ventas_json}};
+        const VENDEDOR_NOMBRE = '{{nombre_usuario}}';  // nombre del usuario con sesión activa
+        const ROL_USUARIO     = '{{rol_usuario}}';
+
+        const filtroFecha = document.getElementById('filtro-fecha');
+        const filtroTipo = document.getElementById('filtro-tipo');
+
+        let ventasFiltradas = [];
+
+        // Parsing the date string from DB "16 de abril de 2026, 15:45" to Date object
+        function armarFecha(fechaStr) {
+            // Ejemplo: "20 de abril de 2026, 17:43"
+            const mesesMap = {
+                'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
+                'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
+            };
+            try {
+                const parts = fechaStr.split(', ');
+                const dateParts = parts[0].split(' de ');
+                const dia = parseInt(dateParts[0]);
+                const mes = mesesMap[dateParts[1].toLowerCase()];
+                const ano = parseInt(dateParts[2]);
+                const timeParts = parts[1].split(':');
+                const hora = parseInt(timeParts[0]);
+                const min = parseInt(timeParts[1]);
+                return new Date(ano, mes, dia, hora, min);
+            } catch (e) {
+                return new Date(); // Fallback si el formato no es parseable
+            }
+        }
+
+        function isHoy(dateObj) {
+            const hoy = new Date();
+            return dateObj.getDate() === hoy.getDate() && dateObj.getMonth() === hoy.getMonth() && dateObj.getFullYear() === hoy.getFullYear();
+        }
+
+        function isUltimaSemana(dateObj) {
+            const hoy = new Date();
+            const semanaAtras = new Date();
+            semanaAtras.setDate(hoy.getDate() - 7);
+            return dateObj >= semanaAtras;
+        }
+
+        function isUltimoMes(dateObj) {
+            const hoy = new Date();
+            const mesAtras = new Date();
+            mesAtras.setMonth(hoy.getMonth() - 1);
+            return dateObj >= mesAtras;
+        }
+
+        function formatearCorta(fechaStr) {
+            const d = armarFecha(fechaStr);
+            const dia = d.getDate();
+            const mesesCorto = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+            const mes = mesesCorto[d.getMonth()];
+            const ano = d.getFullYear();
+            const hora = d.getHours().toString().padStart(2, '0');
+            const min = d.getMinutes().toString().padStart(2, '0');
+            return `${dia} ${mes} ${ano}, ${hora}:${min}`;
+        }
+
+        function filtrarYRenderizar() {
+            const fFecha = filtroFecha.value;
+            const fTipo = filtroTipo.value;
+
+            ventasFiltradas = RAW_VENTAS.filter(v => {
+                const fechaDateObj = armarFecha(v.fecha);
+
+                // Filtro fecha
+                let cumpleFe = true;
+                if (fFecha === 'hoy') cumpleFe = isHoy(fechaDateObj);
+                else if (fFecha === 'semana') cumpleFe = isUltimaSemana(fechaDateObj);
+                else if (fFecha === 'mes') cumpleFe = isUltimoMes(fechaDateObj);
+
+                // Filtro tipo
+                let cumpleTi = fTipo === 'todos' || v.tipo === fTipo;
+
+                return cumpleFe && cumpleTi;
+            });
+
+            // Stats
+            const totDinero = ventasFiltradas.reduce((sum, v) => sum + parseFloat(v.total), 0);
+            const qty = ventasFiltradas.length;
+            const prom = qty > 0 ? (totDinero / qty) : 0;
+            const qtyOnline = ventasFiltradas.filter(v => v.tipo === 'online').length;
+            const qtyTienda = ventasFiltradas.filter(v => v.tipo === 'tienda').length;
+
+            document.getElementById('stat-total-dinero').innerText = `Bs ${totDinero.toLocaleString('en-US')}`;
+            document.getElementById('stat-transacciones').innerText = qty;
+            document.getElementById('stat-promedio').innerText = `Bs ${prom.toLocaleString('en-US', {maximumFractionDigits: 2})}`;
+            document.getElementById('stat-online').innerText = qtyOnline;
+            document.getElementById('stat-tienda').innerText = qtyTienda;
+
+            const tbody = document.getElementById('ventas-tbody');
+            const emptyState = document.getElementById('ventas-empty');
+
+            tbody.innerHTML = '';
+            if (qty === 0) {
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+                ventasFiltradas.forEach(v => {
+                    const tr = document.createElement('tr');
+
+                    // Badge rendering
+                    const esOnline = v.tipo === 'online';
+                    const badgeHtml = `<span class="badge ${esOnline ? 'badge-online' : 'badge-tienda'}">${esOnline ? 'Online' : 'Tienda'}</span>`;
+
+                    tr.innerHTML = `
+                        <td>${v.id}</td>
+                        <td>${formatearCorta(v.fecha)}</td>
+                        <td>${v.clienteNombre}</td>
+                        <td>${badgeHtml}</td>
+                        <td>${v.vendedor}</td>
+                        <td>Bs ${v.total.toLocaleString('en-US')}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        function generarReporte() {
+            if (ventasFiltradas.length === 0) {
+                alert("No hay ventas para generar reporte.");
+                return;
+            }
+
+            const selectOptions = filtroFecha.options;
+            const textPeriodo = selectOptions[filtroFecha.selectedIndex].text;
+
+            const payload = {
+                periodo: textPeriodo,
+                ventas: ventasFiltradas
+            };
+
+            const form = document.getElementById('report-form');
+            form.innerHTML = `<input type='hidden' name='data' id='report-data-input'>`;
+            const input = document.getElementById('report-data-input');
+            input.value = JSON.stringify(payload);
+
+            const newWindow = window.open('about:blank', '_blank');
+            newWindow.document.write('Generando reporte...');
+
+            fetch('/ventas/reporte', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(resp => resp.text())
+            .then(html => {
+                newWindow.document.open();
+                newWindow.document.write(html);
+                newWindow.document.close();
+            }).catch(err => {
+                newWindow.close();
+                alert("Error generando reporte");
+            });
+        }
+
+        filtroFecha.addEventListener('change', filtrarYRenderizar);
+        filtroTipo.addEventListener('change', filtrarYRenderizar);
+
+        // Inicio
+        filtrarYRenderizar();
+
+        // ══════════════════════════════════════════
+        // LÓGICA MODAL: NUEVA VENTA FÍSICA
+        // ══════════════════════════════════════════
+
+        let catalogoProductos = [];  // cargado desde /api/productos-disponibles
+        let itemsVenta = [];         // ítems agregados al carrito de la venta
+
+        let _pedidoIdActual = null;  // ID del pedido recién registrado (para factura)
+
+        async function abrirModalVenta() {
+            // Limpiar estado previo
+            _pedidoIdActual = null;
+            itemsVenta = [];
+            document.getElementById('mv-cliente').value = '';
+            document.getElementById('mv-metodo').value = 'efectivo';
+            document.getElementById('mv-cantidad').value = 1;
+            document.getElementById('mv-error').style.display = 'none';
+            document.getElementById('mv-paso2').style.display = 'none';
+            document.getElementById('mv-paso1-botones').style.display = 'flex';
+            document.getElementById('mv-vendedor-nombre').textContent = VENDEDOR_NOMBRE;
+            renderizarItemsVenta();
+
+            // Cargar productos con stock desde el servidor
+            try {
+                const resp = await fetch('/api/productos-disponibles');
+                const data = await resp.json();
+                if (!data.success) throw new Error(data.error);
+                catalogoProductos = data.productos;
+
+                const sel = document.getElementById('mv-producto');
+                sel.innerHTML = '<option value="">— Selecciona un producto —</option>';
+                catalogoProductos.forEach(p => {
+                    const promo = p.en_promocion ? ' 🏷️' : '';
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.dataset.stock = p.stock;
+                    opt.dataset.precio = p.precio;
+                    opt.dataset.nombre = p.nombre;
+                    opt.dataset.material = p.material;
+                    opt.textContent = `${p.nombre} — ${p.material} | Bs ${p.precio.toLocaleString('en-US')} | Stock: ${p.stock}${promo}`;
+                    sel.appendChild(opt);
+                });
+                actualizarInfoProducto();
+            } catch(e) {
+                alert('Error cargando productos: ' + e.message);
+                return;
+            }
+
+            const modal = document.getElementById('modal-venta');
+            modal.style.display = 'flex';
+        }
+
+        function cerrarModalVenta() {
+            document.getElementById('modal-venta').style.display = 'none';
+        }
+
+        // Cerrar al hacer clic en el fondo
+        document.getElementById('modal-venta').addEventListener('click', function(e) {
+            if (e.target === this) cerrarModalVenta();
+        });
+
+        function actualizarInfoProducto() {
+            const sel = document.getElementById('mv-producto');
+            const opt = sel.options[sel.selectedIndex];
+            const info = document.getElementById('mv-info-prod');
+            const cantInput = document.getElementById('mv-cantidad');
+
+            if (!opt || !opt.value) {
+                info.textContent = '';
+                cantInput.max = 99;
+                return;
+            }
+            const stock = parseInt(opt.dataset.stock);
+            cantInput.max = stock;
+            cantInput.value = 1;
+            info.innerHTML = `<span style="color:#FFB900;">Stock disponible: <strong>${stock}</strong></span>`;
+        }
+
+        function agregarItemVenta() {
+            const sel = document.getElementById('mv-producto');
+            const opt = sel.options[sel.selectedIndex];
+            if (!opt || !opt.value) { mostrarErrorModal('Selecciona un producto primero'); return; }
+
+            const pid = parseInt(opt.value);
+            const qty = parseInt(document.getElementById('mv-cantidad').value) || 1;
+            const stock = parseInt(opt.dataset.stock);
+            const precio = parseFloat(opt.dataset.precio);
+            const nombre = opt.dataset.nombre;
+            const material = opt.dataset.material;
+
+            if (qty < 1) { mostrarErrorModal('La cantidad debe ser al menos 1'); return; }
+
+            // Calcular cuánto ya se agregó de este producto
+            const yaAgregado = itemsVenta.filter(i => i.pid === pid).reduce((s, i) => s + i.qty, 0);
+            if (yaAgregado + qty > stock) {
+                mostrarErrorModal(`Stock insuficiente. Disponible: ${stock}, ya agregado: ${yaAgregado}`);
+                return;
+            }
+
+            // Si ya existe el producto, sumar cantidad
+            const existente = itemsVenta.find(i => i.pid === pid);
+            if (existente) {
+                existente.qty += qty;
+            } else {
+                itemsVenta.push({ pid, qty, precio, nombre, material, stock });
+            }
+
+            document.getElementById('mv-error').style.display = 'none';
+            renderizarItemsVenta();
+
+            // Reset selector
+            sel.value = '';
+            document.getElementById('mv-cantidad').value = 1;
+            document.getElementById('mv-info-prod').textContent = '';
+        }
+
+        function quitarItemVenta(pid) {
+            itemsVenta = itemsVenta.filter(i => i.pid !== pid);
+            renderizarItemsVenta();
+        }
+
+        function renderizarItemsVenta() {
+            const tbody = document.getElementById('mv-items-tbody');
+            const wrapper = document.getElementById('mv-items-wrapper');
+            const empty = document.getElementById('mv-empty');
+            const totalEl = document.getElementById('mv-total');
+
+            tbody.innerHTML = '';
+            if (itemsVenta.length === 0) {
+                wrapper.style.display = 'none';
+                empty.style.display = 'block';
+                totalEl.textContent = '0.00';
+                return;
+            }
+            wrapper.style.display = 'block';
+            empty.style.display = 'none';
+
+            let total = 0;
+            itemsVenta.forEach(item => {
+                const sub = item.precio * item.qty;
+                total += sub;
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                tr.innerHTML = `
+                    <td style="padding:0.6rem 0.75rem;color:#e0e0e0;">
+                        <div style="font-weight:500;">${item.nombre}</div>
+                        <div style="font-size:0.76rem;color:#888;">${item.material}</div>
+                    </td>
+                    <td style="padding:0.6rem 0.75rem;text-align:center;color:#ccc;">${item.qty}</td>
+                    <td style="padding:0.6rem 0.75rem;text-align:right;color:#ccc;">Bs ${item.precio.toLocaleString('en-US')}</td>
+                    <td style="padding:0.6rem 0.75rem;text-align:right;color:#FFB900;font-weight:600;">Bs ${sub.toLocaleString('en-US', {minimumFractionDigits:2})}</td>
+                    <td style="padding:0.6rem 0.5rem;text-align:center;">
+                        <button class="mv-quitar-btn" onclick="quitarItemVenta(${item.pid})" title="Quitar">✕</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            totalEl.textContent = total.toLocaleString('en-US', {minimumFractionDigits:2});
+        }
+
+        function mostrarErrorModal(msg) {
+            const el = document.getElementById('mv-error');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        async function confirmarVentaFisica() {
+            if (itemsVenta.length === 0) { mostrarErrorModal('Agrega al menos un producto'); return; }
+
+            const btn = document.getElementById('mv-btn-confirmar');
+            btn.textContent = 'Registrando...';
+            btn.disabled = true;
+
+            const clienteNombre = document.getElementById('mv-cliente').value.trim() || 'Cliente Mostrador';
+            const payload = {
+                cliente_nombre: clienteNombre,
+                metodo_pago: document.getElementById('mv-metodo').value,
+                items: itemsVenta.map(i => ({ producto_id: i.pid, cantidad: i.qty }))
+            };
+
+            try {
+                const resp = await fetch('/api/venta-fisica', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await resp.json();
+
+                if (!data.success) {
+                    mostrarErrorModal(data.error || 'Error al registrar la venta');
+                    btn.textContent = 'Registrar Venta';
+                    btn.disabled = false;
+                    return;
+                }
+
+                // ✅ Éxito → guardar pedido_id y mostrar Paso 2 (opción factura)
+                _pedidoIdActual = data.pedido_id;
+                document.getElementById('mv-confirmacion-resumen').textContent =
+                    `${data.venta_id} · Cliente: ${data.cliente} · Total: Bs ${parseFloat(data.total).toLocaleString('en-US', {minimumFractionDigits:2})} · Vendedor: ${VENDEDOR_NOMBRE}`;
+
+                // Ocultar botones del paso 1 y mostrar panel de factura
+                document.getElementById('mv-paso1-botones').style.display = 'none';
+                document.getElementById('mv-error').style.display = 'none';
+                document.getElementById('mv-paso2').style.display = 'block';
+
+                // Deshabilitar edición (venta ya registrada)
+                document.getElementById('mv-cliente').disabled = true;
+                document.getElementById('mv-metodo').disabled = true;
+
+            } catch(e) {
+                mostrarErrorModal('Error de conexión: ' + e.message);
+                btn.textContent = 'Registrar Venta';
+                btn.disabled = false;
+            }
+        }
+
+        async function generarFacturaPresencial() {
+            if (!_pedidoIdActual) return;
+            const nit = (document.getElementById('mv-nit').value || '').trim() || 'S/N';
+            const btnF = document.getElementById('mv-btn-factura');
+            btnF.textContent = 'Generando...';
+            btnF.disabled = true;
+
+            try {
+                // 1️⃣ Registrar la factura en la BD usando el endpoint existente
+                const resp = await fetch('/api/factura/generar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pedido_id: _pedidoIdActual, nit: nit })
+                });
+                const data = await resp.json();
+                if (!data.success) {
+                    alert('Error generando factura: ' + data.error);
+                    btnF.textContent = 'Generar PDF';
+                    btnF.disabled = false;
+                    return;
+                }
+
+                // 2️⃣ Abrir PDF en nueva pestaña (ruta ya existente en el sistema)
+                window.open(`/factura/pdf/${_pedidoIdActual}`, '_blank');
+
+                // 3️⃣ Recargar tabla de ventas
+                window.location.reload();
+
+            } catch(e) {
+                alert('Error de conexión: ' + e.message);
+                btnF.textContent = 'Generar PDF';
+                btnF.disabled = false;
+            }
+        }
+
+        function omitirFactura() {
+            cerrarModalVenta();
+            window.location.reload();
+        }
+
+        // La factura presencial se genera desde el modal de Nueva Venta (Paso 2)
+        // El botón de Factura en la tabla fue eliminado para simplificar el flujo
+    </script>
+</body>
+</html>

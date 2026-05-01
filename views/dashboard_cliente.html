@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Pedidos - Joyería</title>
+    <link rel="stylesheet" href="/static/estilo.css?v=2">
+</head>
+<body class="dashboard-body">
+
+    <!-- BARRA SUPERIOR -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-left">
+            <div class="nav-brand">
+                <div class="nav-logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFB900" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13"/><path d="M13 3l3 6-4 13"/><path d="M2 9h20"/>
+                    </svg>
+                    <span>Joyería</span>
+                </div>
+                <button class="menu-toggle" onclick="document.getElementById('navbar').classList.toggle('menu-open')">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="nav-link active">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>
+                    Mis Pedidos
+                </a>
+                <a href="/catalogo" class="nav-link">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                    Catálogo
+                </a>
+                <a href="/perfil_cliente" class="nav-link">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Perfil
+                </a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="user-info">
+                <span class="user-name">{{nombre_usuario}}</span>
+                <span class="user-role">Cliente</span>
+            </div>
+            <a href="/login" class="btn-salir">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Salir
+            </a>
+        </div>
+    </nav>
+    <!-- CUERPO PRINCIPAL -->
+    <main class="dashboard-container">
+        <div class="dashboard-header">
+            <div>
+                <h1 class="dash-title">Mis Pedidos</h1>
+                <p class="dash-subtitle">Consulta el estado de tus compras</p>
+            </div>
+            <div class="welcome-notification" onclick="this.style.opacity='0'; setTimeout(() => this.style.display='none', 300);" title="Haz clic para ocultar">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10" fill="#16a34a" stroke="none"></circle>
+                    <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+                <span>Bienvenido {{nombre_usuario}}</span>
+            </div>
+        </div>
+        <!-- Banner Morado Encuesta -->
+        <div class="banner bg-purple">
+            <div class="banner-content">
+                <h2 class="banner-title">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    ¡Tu opinión importa!
+                </h2>
+                <p>Ayúdanos a mejorar completando nuestra breve encuesta de satisfacción</p>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSeA_OfiWeXL_dwlIIl2RYOXWAdl4MmdOFh02yj4_wgDkvVUxw/viewform?usp=dialog" target="_blank" class="banner-btn text-purple">
+                    Completar Encuesta
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+            </div>
+            <div class="banner-decor">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 2h9l5 5v15H6z"/>
+                  <path d="M15 2v5h5"/>
+                  <line x1="8" y1="13" x2="16" y2="13"/>
+                  <line x1="8" y1="17" x2="16" y2="17"/>
+                  <line x1="8" y1="9" x2="12" y2="9"/>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Banner Naranja Catálogo -->
+        <div class="banner bg-amber">
+            <div class="banner-content">
+                <h2 class="banner-title">¿Buscas algo especial?</h2>
+                <p>Explora nuestro catálogo de joyas exclusivas</p>
+                <a href="/catalogo" class="banner-btn text-amber">Ver Catálogo</a>
+            </div>
+            <div class="banner-decor">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 7h16l-1 13H5L4 7z"/>
+                  <path d="M7 7a5 5 0 0 1 10 0"/>
+                  <path d="M9 11a3 3 0 0 0 6 0"/>
+                </svg>
+            </div>
+        </div>
+        <!-- Caja Blanca de Pedidos -->
+        <div class="orders-card">
+            <h2>Historial de Pedidos</h2>
+            % if not pedidos:
+            <div class="empty-orders">
+                <svg width="64" height="64" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24" style="margin: 0 auto 15px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                <p>Aún no has realizado ningún pedido</p>
+                <a href="/catalogo" class="catalog-link">Explora nuestro catálogo</a>
+            </div>
+            % else:
+            <div class="orders-list">
+                % for p in pedidos:
+                <div class="order-card-detail">
+                    <div class="order-header-main">
+                        <div class="order-header-left">
+                            <div style="display:flex; gap:10px; align-items:flex-start;">
+                                <svg width="20" height="20" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24" style="margin-top: 2px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <div>
+                                     <div class="order-id">Pedido P00{{p['id']}}</div>
+                                     <div class="order-date">{{p['fecha']}}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="order-status-badge">{{p['estado']}}</div>
+                            <div class="order-method">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="M16.71 13.88l-3.23-3.22"/></svg>
+                                Método: {{p['metodo_pago'].title()}}
+                            </div>
+                        </div>
+                        <div class="order-header-right">
+                            <div class="order-total-lbl">Total</div>
+                            <div class="order-total-val">Bs {{p['total']}}</div>
+                        </div>
+                    </div>
+                    <hr class="order-divider">
+                    <div class="order-products-title">Productos:</div>
+                    % for prod in p['productos']:
+                    <div class="order-product-row">
+                        <div>
+                            <div class="order-product-name">{{prod['nombre']}}</div>
+                            <div class="order-product-qty">Cantidad: {{prod['cantidad']}}</div>
+                        </div>
+                        <div class="order-product-price">Bs {{prod['precio'] * prod['cantidad']}}</div>
+                    </div>
+                    % end
+                </div>
+                % end
+            </div>
+            % end
+        </div>
+    </main>
+    <!-- PIE DE PÁGINA (Footer) -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="nav-logo" style="margin-bottom: 15px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFB900" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13"/><path d="M13 3l3 6-4 13"/><path d="M2 9h20"/></svg>
+                    <span>Joyería</span>
+                </div>
+                <p>Tu joyería de confianza en Bolivia. Oro, plata y las mejores piedras preciosas.</p>
+            </div>
+            <div class="footer-contact">
+                <h3>Contacto</h3>
+                <p>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="#FFB900" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"
+                    style="vertical-align: middle; margin-right: 6px;">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2
+            19.79 19.79 0 0 1-8.63-3.07
+            19.5 19.5 0 0 1-6-6
+            19.79 19.79 0 0 1-3.07-8.67
+            A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72
+            12.84 12.84 0 0 0 .7 2.81
+            2 2 0 0 1-.45 2.11L8.09 9.91
+            a16 16 0 0 0 6 6l1.27-1.27
+            a2 2 0 0 1 2.11-.45
+            12.84 12.84 0 0 0 2.81.7
+            A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                +591 12345678
+                </p>
+                <p>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="#FFB900" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"
+                    style="vertical-align: middle; margin-right: 6px;">
+            <rect x="3" y="5" width="18" height="14" rx="2"/>
+            <path d="M3 7l9 6 9-6"/>
+                    </svg>
+                contacto@joyeria.com
+                </p>
+                <p>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="#FFB900" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"
+                    style="vertical-align: middle; margin-right: 6px;">
+            <path d="M12 21s-6-5.33-6-10a6 6 0 1 1 12 0c0 4.67-6 10-6 10z"/>
+            <circle cx="12" cy="11" r="2.5"/>
+                    </svg>
+                Santa Cruz, Bolivia
+                </p>
+            </div>
+            <div class="footer-social">
+                <h3>Síguenos</h3>
+                <a href="#" class="flex items-center gap-3 text-sm hover:text-amber-400 transition-colors group">
+                    <div style="background:#16a34a; padding:8px; border-radius:8px; display: inline-flex; align-items: center; justify-content: center;"
+                    class="group-hover:bg-green-500 transition-colors">
+
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="white" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2
+            19.79 19.79 0 0 1-8.63-3.07
+            19.5 19.5 0 0 1-6-6
+            19.79 19.79 0 0 1-3.07-8.67
+            A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72
+            12.84 12.84 0 0 0 .7 2.81
+            2 2 0 0 1-.45 2.11L8.09 9.91
+            a16 16 0 0 0 6 6l1.27-1.27
+            a2 2 0 0 1 2.11-.45
+            12.84 12.84 0 0 0 2.81.7
+            A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                    </div>
+                WhatsApp
+                </a>
+                <a href="https://facebook.com/joyeriafenix"
+                target="_blank"
+                class="flex items-center gap-3 text-sm hover:text-amber-400 transition-colors group">
+
+                    <div style="background:#2563eb; padding:8px; border-radius:8px;display: inline-flex; align-items: center; justify-content: center;"
+                    class="group-hover:bg-blue-500 transition-colors">
+
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+            <path d="M22 12a10 10 0 1 0-11.5 9.87v-6.99H8.08v-2.88h2.42V9.41
+            c0-2.39 1.43-3.71 3.62-3.71 1.05 0 2.15.19 2.15.19v2.36h-1.21
+            c-1.2 0-1.57.74-1.57 1.5v1.8h2.67l-.43 2.88h-2.24v6.99A10 10 0 0 0 22 12z"/>
+                    </svg>
+                    </div>
+                Facebook
+                </a>
+                <a href="https://tiktok.com/@joyeriafenix"
+                target="_blank"
+                class="flex items-center gap-3 text-sm hover:text-amber-400 transition-colors group">
+                    <div style="background:#000; padding:8px; border-radius:8px;display: inline-flex; align-items: center; justify-content: center;"
+                    class="group-hover:bg-gray-800 transition-colors">
+
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67
+            a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64
+            2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05
+            A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7
+            a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                    </svg>
+                    </div>
+                TikTok
+                </a>
+            </div>
+            <div class="footer-map">
+                <h3>Ubicación</h3>
+                <div class="map-placeholder">
+                    <p style="text-align:center; padding-top:40px; color:#9ca3af; margin:0;">Mapa ilustrativo</p>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 Joyería. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+</body>
+</html>

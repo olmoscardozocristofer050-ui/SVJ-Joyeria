@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Pedidos - Joyería</title>
+    <link rel="stylesheet" href="/static/estilo.css?v=4">
+    <style>
+        .p-bg { background-color: #f9fafb; min-height: 100vh; font-family: system-ui, -apple-system, sans-serif; overflow-x: hidden; width: 100%; }
+        .p-container { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
+        .p-title { font-size: 1.875rem; margin-bottom: 0.5rem;color:black; }
+        .p-subtitle { color: #4b5563; margin-bottom: 2rem; }
+
+        .p-stats-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+        @media (min-width: 768px) { .p-stats-grid { grid-template-columns: repeat(5, 1fr); } }
+        .p-stat-card { background: white; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); padding: 1.5rem; }
+        .p-stat-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+        .p-stat-icon { padding: 0.5rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; }
+        .p-stat-title { font-size: 0.875rem; color: #4b5563; }
+        .p-stat-value { font-size: 1.5rem; font-weight: 400; }
+
+        .p-bg-amber { background-color: #fef3c7; color: #d97706; }
+        .p-bg-blue { background-color: #dbeafe; color: #2563eb; }
+        .p-bg-green { background-color: #dcfce3; color: #16a34a; }
+        .p-bg-gray { background-color: #f3f4f6; color: #4b5563; }
+        .p-bg-red { background-color: #fee2e2; color: #dc2626; }
+
+        .p-filters { background: white; border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
+        .p-filters-title { display: flex; align-items: center; gap: 0.5rem; font-size: 1.125rem; margin-bottom: 1rem; text-transform: none; }
+        .p-filters-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        @media (min-width: 768px) { .p-filters-grid { grid-template-columns: 1fr 1fr; } }
+        .p-filter-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; margin-bottom: 0.5rem; font-weight:600;color:black;}
+        .p-input { width: 100%; padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; outline: none; box-sizing: border-box; background-color: #ffffff; color: #111827; }
+        .p-input:focus { border-color: #FFB900; box-shadow: 0 0 0 2px rgba(255, 185, 0, 0.2); }
+
+        .p-orders { display: flex; flex-direction: column; gap: 1rem; }
+        .p-order-card { background: white; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); transition: box-shadow 0.2s; }
+        .p-order-card:hover { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); }
+        .p-order-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
+        .p-order-id-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+        .p-order-id { font-size: 1.25rem; font-weight: 500; }
+        .p-badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; text-transform: capitalize; }
+        .p-order-client { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #4b5563; margin-bottom: 0.25rem; }
+        .p-order-date { font-size: 0.875rem; color: #6b7280; }
+        .p-order-vendor { font-size: 0.875rem; color: #4b5563; margin-top: 0.25rem; }
+        .p-order-payment { background: #fef3c7; color: #b45309; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; text-transform: capitalize; }
+        .p-order-total-label { font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem; text-align: right; }
+        .p-order-total-val { font-size: 1.5rem; font-weight: 400; text-align: right; }
+
+        .p-products { border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; padding: 1rem 0; margin-bottom: 1rem; }
+        .p-products-title { font-size: 0.875rem; color: #4b5563; margin-bottom: 0.75rem; }
+        .p-product-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.5rem; }
+        .p-product-name { font-size: 1rem; }
+        .p-product-qty { font-size: 0.875rem; color: #6b7280; }
+
+        .p-actions-title { font-size: 0.875rem; color: #4b5563; margin-bottom: 0.5rem; }
+        .p-actions-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .p-btn { padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; cursor: pointer; transition: 0.2s; border: none; display: flex; align-items: center; gap: 0.5rem; text-transform: capitalize;}
+        .p-btn:disabled { background: #e5e7eb; color: #6b7280; cursor: not-allowed; }
+        .p-btn-active { background: #d97706; color: white; }
+        .p-btn-active:hover { background: #b45309; }
+
+        .p-empty { background: white; border-radius: 0.75rem; padding: 3rem; text-align: center; color: #6b7280; }
+        .p-empty svg { margin: 0 auto 1rem auto; color: #9ca3af; }
+    </style>
+</head>
+<body class="vendor-body p-bg">
+    <!-- Navbar Unificado -->
+    <nav class="navbar" id="v-navbar">
+        <div class="nav-left">
+            <div class="nav-brand">
+                <div class="nav-logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFB900" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13"/><path d="M13 3l3 6-4 13"/><path d="M2 9h20"/>
+                    </svg>
+                    <span>Joyería</span>
+                </div>
+                <!-- Menu Toggle Button -->
+                <button class="menu-toggle" onclick="document.getElementById('v-navbar').classList.toggle('menu-open')">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+            </div>
+
+            <div class="nav-links">
+                <a href="/dashboard_admin" class="nav-link"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Dashboard</a>
+                <a href="/ventas" class="nav-link"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> Ventas</a>
+                <a href="/pedidos_admin" class="nav-link active"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 7l7 4 7-4-7-4z"/><path d="M5 7v8l7 4 7-4V7"/><path d="M12 11v8"/></svg> Pedidos</a>
+                <a href="/productos" class="nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13"/><path d="M13 3l3 6-4 13"/><path d="M2 9h20"/>
+                    </svg>
+                Productos</a>
+                <a href="/inventario" class="nav-link active">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                    Inventario
+                </a>
+                <a href="/clientes" class="nav-link active">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Clientes
+                </a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="user-info">
+                <span class="user-name" style="color:white;">Administrador</span>
+                <span class="user-role" style="color: #FFB900;">Admin(Control Sistema)</span>
+            </div>
+            <a href="/login" class="btn-salir">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Salir
+            </a>
+        </div>
+    </nav>
+
+    <div class="p-container">
+        <div>
+            <h1 class="p-title" style="text-align: left;">Gestión de Pedidos</h1>
+            <p class="p-subtitle">Administra y actualiza el estado de los pedidos</p>
+        </div>
+
+        <div class="p-tabs" style="display:flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+            <button id="btn-tab-pedidos" class="p-tab active" onclick="showTab('pedidos')" style="background:none; border:none; padding:0.75rem 1.5rem; font-size:1rem; font-weight:600; cursor:pointer; color:#b45309; border-bottom:2px solid #d97706; margin-bottom:-1px;">Pedidos</button>
+            <button id="btn-tab-facturas" class="p-tab" onclick="showTab('facturas')" style="background:none; border:none; padding:0.75rem 1.5rem; font-size:1rem; font-weight:600; cursor:pointer; color:#6b7280; border-bottom:2px solid transparent; margin-bottom:-1px; transition: 0.2s;">Historial de Facturas</button>
+        </div>
+
+        <div id="tab-pedidos">
+        <!-- Stats -->
+        <div class="p-stats-grid">
+            <div class="p-stat-card">
+                <div class="p-stat-header">
+                    <div class="p-stat-icon p-bg-amber">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <span class="p-stat-title">Pendientes</span>
+                </div>
+                <div class="p-stat-value" id="stat-pendiente">0</div>
+            </div>
+            <div class="p-stat-card">
+                <div class="p-stat-header">
+                    <div class="p-stat-icon p-bg-blue">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2 3 7l9 5 9-5-9-5z"/>
+                        <path d="M3 7v10l9 5 9-5V7"/>
+                        <path d="M12 12v10"/>
+                        <path d="M21 7l-9 5"/>
+                    </svg>
+                    </div>
+                    <span class="p-stat-title">Procesando</span>
+                </div>
+                <div class="p-stat-value" id="stat-procesando">0</div>
+            </div>
+            <div class="p-stat-card">
+                <div class="p-stat-header">
+                    <div class="p-stat-icon p-bg-green">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- caja trasera -->
+                        <rect x="2" y="7" width="11" height="10" rx="2"/>
+                        <!-- cabina -->
+                        <path d="M13 10h3l3 3v4h-6z"/>
+                        <!-- ruedas -->
+                        <circle cx="7" cy="18" r="2"/>
+                        <circle cx="17" cy="18" r="2"/>
+                        </svg>
+                    </div>
+                    <span class="p-stat-title">Listos</span>
+                </div>
+                <div class="p-stat-value" id="stat-listo">0</div>
+            </div>
+            <div class="p-stat-card">
+                <div class="p-stat-header">
+                    <div class="p-stat-icon p-bg-gray">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        <!-- Entregados check circle -->
+                    </div>
+                    <span class="p-stat-title">Entregados</span>
+                </div>
+                <div class="p-stat-value" id="stat-entregado">0</div>
+            </div>
+            <div class="p-stat-card">
+                <div class="p-stat-header">
+                    <div class="p-stat-icon p-bg-red">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                    </div>
+                    <span class="p-stat-title">Cancelados</span>
+                </div>
+                <div class="p-stat-value" id="stat-cancelado">0</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="p-filters">
+            <h2 class="p-filters-title">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                Filtros
+            </h2>
+            <div class="p-filters-grid">
+                <div>
+                    <label class="p-filter-label">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        Buscar Cliente o ID
+                    </label>
+                    <input type="text" id="filter-text" class="p-input" placeholder="Nombre del cliente o ID del pedido...">
+                </div>
+                <div>
+                    <label class="p-filter-label">Estado</label>
+                    <select id="filter-status" class="p-input">
+                        <option value="todos">Todos</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="procesando">Procesando</option>
+                        <option value="listo">Listo</option>
+                        <option value="entregado">Entregado</option>
+                        <option value="cancelado">Cancelado</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders -->
+        <div class="p-orders" id="orders-container">
+            <!-- Rendered by JS -->
+        </div>
+        </div>
+
+        <div id="tab-facturas" style="display:none;">
+            <div class="p-filters">
+                <h2 class="p-filters-title">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                    Filtros de Facturas
+                </h2>
+                <div class="p-filters-grid">
+                    <div>
+                        <label class="p-filter-label">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            Buscar Número o Cliente
+                        </label>
+                        <input type="text" id="filter-factura-text" class="p-input" placeholder="Nº de factura o nombre del cliente...">
+                    </div>
+                </div>
+            </div>
+            <div class="p-orders" id="facturas-container">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const RAW_PEDIDOS = {{!pedidos_json}};
+        const RAW_FACTURAS = {{!facturas_json}};
+        const USER_INFO = {{!user_info}};
+
+        function showTab(tabName) {
+            document.getElementById('tab-pedidos').style.display = tabName === 'pedidos' ? 'block' : 'none';
+            document.getElementById('tab-facturas').style.display = tabName === 'facturas' ? 'block' : 'none';
+
+            document.getElementById('btn-tab-pedidos').style.color = tabName === 'pedidos' ? '#b45309' : '#6b7280';
+            document.getElementById('btn-tab-pedidos').style.borderBottomColor = tabName === 'pedidos' ? '#d97706' : 'transparent';
+
+            document.getElementById('btn-tab-facturas').style.color = tabName === 'facturas' ? '#b45309' : '#6b7280';
+            document.getElementById('btn-tab-facturas').style.borderBottomColor = tabName === 'facturas' ? '#d97706' : 'transparent';
+        }
+
+        let filteredPedidos = [];
+
+        const filterText = document.getElementById('filter-text');
+        const filterStatus = document.getElementById('filter-status');
+        const ordersContainer = document.getElementById('orders-container');
+
+        const estadosPosibles = ['pendiente', 'procesando', 'listo', 'entregado', 'cancelado'];
+
+        function getEstadoColor(estado) {
+            switch(estado.toLowerCase()) {
+                case "pendiente": return "p-bg-amber";
+                case "procesando": return "p-bg-blue";
+                case "listo": return "p-bg-green";
+                case "cancelado": return "p-bg-red";
+                case "entregado":
+                default: return "p-bg-gray";
+            }
+        }
+
+        function getEstadoIcon(estado) {
+            switch(estado.toLowerCase()) {
+                case "pendiente": return `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+                case "procesando": return `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>`;
+                case "listo": return `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+                case "cancelado": return `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+                case "entregado":
+                default: return `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+            }
+        }
+
+        function filterAndRender() {
+            const text = filterText.value.toLowerCase();
+            const status = filterStatus.value.toLowerCase();
+
+            // First filtering for roles mapping
+            let userBasePedidos = RAW_PEDIDOS.filter(pedido => {
+                if (USER_INFO.role === 'vendedor') {
+                    // Vendedor sees it if it's assigned to them OR it's pending without assignment
+                    const isAssignedToMe = pedido.vendedorId === USER_INFO.id;
+                    const isPendingUnassigned = pedido.estado.toLowerCase() === 'pendiente' && !pedido.vendedorId;
+                    if (!isAssignedToMe && !isPendingUnassigned) return false;
+                }
+                return true;
+            });
+
+            // Then filtering for inputs
+            filteredPedidos = userBasePedidos.filter(pedido => {
+                const cumpleEstado = status === "todos" || pedido.estado.toLowerCase() === status;
+                const cumpleCliente = !text ||
+                                      pedido.clienteNombre.toLowerCase().includes(text) ||
+                                      pedido.id.toLowerCase().includes(text);
+                return cumpleEstado && cumpleCliente;
+            });
+
+            updateStats(filteredPedidos);
+            renderOrders();
+        }
+
+        function updateStats(pedidos) {
+            let stats = { pendiente: 0, procesando: 0, listo: 0, entregado: 0, cancelado: 0 };
+            pedidos.forEach(p => {
+                const s = p.estado.toLowerCase();
+                if(stats[s] !== undefined) stats[s]++;
+            });
+            document.getElementById('stat-pendiente').innerText = stats.pendiente;
+            document.getElementById('stat-procesando').innerText = stats.procesando;
+            document.getElementById('stat-listo').innerText = stats.listo;
+            document.getElementById('stat-entregado').innerText = stats.entregado;
+            document.getElementById('stat-cancelado').innerText = stats.cancelado;
+        }
+
+        function renderOrders() {
+            ordersContainer.innerHTML = '';
+
+            if (filteredPedidos.length === 0) {
+                ordersContainer.innerHTML = `
+                    <div class="p-empty">
+                        <svg width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                        <p>No se encontraron pedidos con los filtros seleccionados</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredPedidos.forEach(pedido => {
+                const div = document.createElement('div');
+                div.className = 'p-order-card';
+
+                let productsHtml = '';
+                pedido.productos.forEach(prod => {
+                    productsHtml += `
+                        <div class="p-product-row">
+                            <div>
+                                <div class="p-product-name">${prod.nombre}</div>
+                                <div class="p-product-qty">${prod.cantidad} x Bs ${prod.precio.toLocaleString('en-US')}</div>
+                            </div>
+                            <div class="p-product-name">Bs ${(prod.cantidad * prod.precio).toLocaleString('en-US')}</div>
+                        </div>
+                    `;
+                });
+
+                let actionsHtml = '';
+                estadosPosibles.forEach(estado => {
+                    const isActive = pedido.estado.toLowerCase() === estado;
+                    actionsHtml += `
+                        <button class="p-btn ${isActive ? '' : 'p-btn-active'}" ${isActive ? 'disabled' : ''} onclick="cambiarEstado(${pedido.real_id}, '${estado}')">
+                            ${getEstadoIcon(estado)} ${estado}
+                        </button>
+                    `;
+                });
+
+                div.innerHTML = `
+                    <div class="p-order-header">
+                        <div>
+                            <div class="p-order-id-row">
+                                <span class="p-order-id">${pedido.id}</span>
+                                <span class="p-badge ${getEstadoColor(pedido.estado)}">
+                                    ${getEstadoIcon(pedido.estado)} ${pedido.estado}
+                                </span>
+                            </div>
+                            <div class="p-order-client">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                Cliente: ${pedido.clienteNombre}
+                            </div>
+                            <div class="p-order-date">${pedido.fecha}</div>
+                            ${pedido.vendedorAsignado ? `<div class="p-order-vendor">Vendedor Asignado: ${pedido.vendedorAsignado}</div>` : ''}
+                            <div class="p-order-payment">Pago: ${pedido.metodoPago || 'Efectivo'}</div>
+                        </div>
+                        <div>
+                            <div class="p-order-total-label">Total</div>
+                            <div class="p-order-total-val">Bs ${pedido.total.toLocaleString('en-US')}</div>
+                        </div>
+                    </div>
+
+                    <div class="p-products">
+                        <div class="p-products-title">Productos:</div>
+                        ${productsHtml}
+                    </div>
+
+                    <div>
+                        <div class="p-actions-title">Cambiar estado:</div>
+                        <div class="p-actions-row">
+                            ${actionsHtml}
+                        </div>
+                    </div>
+                `;
+
+                ordersContainer.appendChild(div);
+            });
+        }
+
+        async function cambiarEstado(realId, nuevoEstado) {
+            try {
+                const res = await fetch('/api/pedido/estado', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({pedido_id: realId, estado: nuevoEstado})
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    // Update exact order in local RAW_PEDIDOS logic to avoid full reload
+                    const orderIndex = RAW_PEDIDOS.findIndex(p => p.real_id === realId);
+                    if (orderIndex > -1) {
+                        RAW_PEDIDOS[orderIndex].estado = nuevoEstado;
+                        if (data.vendedor_asignado && !RAW_PEDIDOS[orderIndex].vendedorId) {
+                            RAW_PEDIDOS[orderIndex].vendedorId = data.vendedor_asignado;
+                            RAW_PEDIDOS[orderIndex].vendedorAsignado = USER_INFO.name;
+                        }
+                    }
+                    filterAndRender();
+                } else {
+                    alert('Error al cambiar estado: ' + data.error);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error de conexión");
+            }
+        }
+
+        let filteredFacturas = [];
+        const filterFacturaText = document.getElementById('filter-factura-text');
+        const facturasContainer = document.getElementById('facturas-container');
+
+        function filterAndRenderFacturas() {
+            const text = filterFacturaText.value.toLowerCase();
+
+            let userBaseFacturas = RAW_FACTURAS.filter(factura => {
+                if (USER_INFO.role === 'vendedor') {
+                    // Solo ver sus facturas (las de sus pedidos asignados)
+                    return factura.vendedorId === USER_INFO.id;
+                }
+                return true;
+            });
+
+            filteredFacturas = userBaseFacturas.filter(factura => {
+                const search = text.trim();
+                if (!search) return true;
+                return factura.clienteNombre.toLowerCase().includes(search) ||
+                       factura.numero_factura.includes(search) ||
+                       (factura.nit && factura.nit.toLowerCase().includes(search));
+            });
+
+            renderFacturas();
+        }
+
+        function renderFacturas() {
+            facturasContainer.innerHTML = '';
+
+            if (filteredFacturas.length === 0) {
+                facturasContainer.innerHTML = `
+                    <div class="p-empty">
+                        <svg width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                        <p>No se encontraron facturas</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredFacturas.forEach(factura => {
+                const div = document.createElement('div');
+                div.className = 'p-order-card';
+
+                let productsHtml = '';
+                factura.productos.forEach(prod => {
+                    productsHtml += `
+                        <div class="p-product-row">
+                            <div>
+                                <div class="p-product-name">${prod.nombre}</div>
+                                <div class="p-product-qty">${prod.cantidad} x Bs ${prod.precio.toLocaleString('en-US')}</div>
+                            </div>
+                            <div class="p-product-name">Bs ${(prod.cantidad * prod.precio).toLocaleString('en-US')}</div>
+                        </div>
+                    `;
+                });
+
+                div.innerHTML = `
+                    <div class="p-order-header">
+                        <div>
+                            <div class="p-order-id-row">
+                                <span class="p-order-id">Factura #${factura.numero_factura}</span>
+                                <span class="p-badge p-bg-green" style="background-color:#dcfce3; color:#16a34a;">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                                    Emitida
+                                </span>
+                            </div>
+                            <div class="p-order-client">Cliente: ${factura.clienteNombre}</div>
+                            <div class="p-order-client">NIT: ${factura.nit}</div>
+                            <div class="p-order-date">Fecha: ${factura.fecha}</div>
+                            <div class="p-order-vendor" style="margin-top:0.25rem;">Pedido Orig: <span style="font-weight:600; color:#b45309;">${factura.pedido_id}</span></div>
+                        </div>
+                        <div>
+                            <div class="p-order-total-label">Total Facturado</div>
+                            <div class="p-order-total-val">Bs ${factura.total.toLocaleString('en-US')}</div>
+                            <div style="margin-top:1rem; text-align:right;">
+                                <a href="/factura/pdf/${factura.pedido_real_id}" target="_blank" class="p-btn" style="display:inline-flex; background:#f3f4f6; color:#111827; text-decoration:none;">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Ver PDF
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-products">
+                        <div class="p-products-title">Detalle de Factura:</div>
+                        ${productsHtml}
+                    </div>
+                `;
+                facturasContainer.appendChild(div);
+            });
+        }
+
+        filterText.addEventListener('input', filterAndRender);
+        filterStatus.addEventListener('change', filterAndRender);
+        filterFacturaText.addEventListener('input', filterAndRenderFacturas);
+
+        // Initial render
+        filterAndRender();
+        filterAndRenderFacturas();
+    </script>
+</body>
+</html>

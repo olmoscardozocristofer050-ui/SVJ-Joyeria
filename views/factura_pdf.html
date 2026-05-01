@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Factura SIAT - Pedido {{factura['pedido_id']}}</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1e293b; background: white; margin: 0; padding: 20px; }
+        .invoice-container { max-width: 800px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+        .header { background: #ea580c; color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { margin: 0; font-size: 24px; display: flex; align-items: center; gap: 10px; }
+        .invoice-details { padding: 30px; display: flex; justify-content: space-between; border-bottom: 2px dashed #cbd5e1; }
+        .company-info h2 { margin: 0 0 5px 0; color: #0f172a; font-size: 20px; }
+        .company-info p { margin: 2px 0; color: #475569; font-size: 14px; }
+        
+        .client-info { text-align: right; }
+        .client-info h3 { margin: 0 0 5px 0; color: #0f172a; font-size: 16px; }
+        .client-info p { margin: 2px 0; color: #475569; font-size: 14px; }
+        
+        .meta-data { display: flex; gap: 40px; margin-top: 15px; }
+        .meta-item { display: flex; flex-direction: column; }
+        .meta-label { font-size: 12px; color: #64748b; font-weight: bold; text-transform: uppercase; }
+        .meta-value { font-size: 15px; font-weight: bold; color: #ea580c; }
+        
+        .products { padding: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+        th { background: #f8fafc; color: #64748b; font-weight: bold; text-transform: uppercase; font-size: 12px; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        
+        .totals { padding: 20px 30px; display: flex; justify-content: flex-end; background: #f8fafc; }
+        .totals-box { width: 300px; }
+        .total-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 14px; }
+        .total-row.grand-total { font-weight: bold; font-size: 18px; color: #ea580c; border-top: 2px solid #e2e8f0; padding-top: 10px; margin-top: 5px; }
+        
+        .footer { padding: 20px 30px; background: #eff6ff; border-top: 1px solid #bfdbfe; font-size: 12px; color: #1e3a8a; text-align: center; }
+        .footer strong { color: #1d4ed8; }
+        
+        @media print {
+            body { padding: 0; background: white; }
+            .invoice-container { border: none; }
+            .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .footer { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #eff6ff !important; border-top: 1px solid #bfdbfe !important; }
+        }
+    </style>
+</head>
+<body onload="window.print()">
+    <div class="invoice-container">
+        <div class="header">
+            <h1>
+                <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                FACTURA SIAT
+            </h1>
+            <div style="text-align: right;">
+                <div style="font-size: 14px; opacity: 0.9;">Documento Fiscal</div>
+                <div style="font-size: 20px; font-weight: bold;">N° {{factura['numero']}}</div>
+            </div>
+        </div>
+        
+        <div class="invoice-details">
+            <div class="company-info">
+                <h2>Joyería SVJ</h2>
+                <p>NIT: 123456789</p>
+                <p>Autorización: SIAT-001-2026</p>
+                <p>Santa Cruz de la Sierra, Bolivia</p>
+                
+                <div class="meta-data">
+                    <div class="meta-item">
+                        <span class="meta-label">Fecha de Emisión</span>
+                        <span class="meta-value">{{factura['fecha']}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="client-info">
+                <h3>Facturar A:</h3>
+                <p><strong>Cliente:</strong> {{factura['cliente']}}</p>
+                <p><strong>NIT/CI:</strong> {{factura['nit']}}</p>
+                <p><strong>Ref. Pedido:</strong> {{factura['pedido_id']}}</p>
+            </div>
+        </div>
+        
+        <div class="products">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cant.</th>
+                        <th>Descripción</th>
+                        <th class="text-right">Precio Unit. (Bs)</th>
+                        <th class="text-right">Subtotal (Bs)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    % for p in factura['productos']:
+                    <tr>
+                        <td class="text-center">{{p['cantidad']}}</td>
+                        <td>{{p['nombre']}}</td>
+                        <td class="text-right">{{f"{p['precio']:,.2f}"}}</td>
+                        <td class="text-right">{{f"{p['precio'] * p['cantidad']:,.2f}"}}</td>
+                    </tr>
+                    % end
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="totals">
+            <div class="totals-box">
+                <div class="total-row">
+                    <span>Subtotal:</span>
+                    <span>Bs {{f"{factura['total']:,.2f}"}}</span>
+                </div>
+                <div class="total-row">
+                    <span>Descuentos:</span>
+                    <span>Bs 0.00</span>
+                </div>
+                <div class="total-row grand-total">
+                    <span>TOTAL A PAGAR:</span>
+                    <span>Bs {{f"{factura['total']:,.2f}"}}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <strong>ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS, EL USO ILÍCITO DE ÉSTA SERÁ SANCIONADO DE ACUERDO A LA LEY.</strong><br>
+            Ley N° 453: "El proveedor deberá exhibir la certificación del Ministerio de Justicia sobre los contratos de adhesión."<br>
+            Este es un documento generado de forma automática.
+        </div>
+    </div>
+</body>
+</html>
