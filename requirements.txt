@@ -1,0 +1,16 @@
+# ===== Dependencias del Sistema SVJ Joyería =====
+# Instalar con: pip install -r requirements.txt
+
+# Framework web principal
+bottle>=0.13.4
+mysql-connector-python>=9.0.0
+python-dotenv>=1.0.1
+
+# Servidor WSGI de producción
+# - gunicorn: requerido por Render (Linux)
+# - waitress: alternativa para Windows local
+gunicorn>=21.2.0
+waitress>=2.1.2
+
+# Procesamiento de imágenes (redimensionar fotos subidas)
+Pillow>=9.5.0

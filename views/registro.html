@@ -1,96 +1,99 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Cuenta - Joyería</title>
-    <link rel="stylesheet" href="/static/estilo.css">
+    <title>Crear cuenta | Joyería SVJ</title>
+    <link rel="stylesheet" href="/static/estilo.css?v=3">
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <a href="/login" class="back-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 19l-7-7 7-7"/>
-                    <path d="M19 12H5"/>
-                </svg>
-                <b>Volver al inicio</b>
-            </a>
-
-            <div class="icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M6 3h12l4 6-10 13L2 9Z"/>
-                    <path d="M11 3 8 9l4 13"/>
-                    <path d="M13 3l3 6-4 13"/>
-                    <path d="M2 9h20"/>
-                </svg>
-            </div>
-
-            <h1><b>Crear Cuenta</b></h1>
-            <p class="subtitle">Regístrate para comprar en nuestra joyería</p>
-
+    <main class="container">
+        <section class="card registration-card">
+            <a href="/" class="back-link">← Volver a la tienda</a>
+            <div class="icon">💎</div>
+            <h1>Crear cuenta</h1>
+            <p class="subtitle">Regístrate para guardar tus pedidos y comprar de forma segura.</p>
             % if error:
-            <div style="background-color: rgba(239, 68, 68, 0.15); color: #fca5a5; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; text-align: center; border: 1px solid rgba(239, 68, 68, 0.3);">
-                {{error}}
-            </div>
+            <div class="form-alert" role="alert">{{error}}</div>
             % end
-
-            <form action="/registro" method="post">
-                <label>Nombre completo</label>
+            <form action="/registro" method="post" id="register-form" novalidate>
+                <label for="nombre_completo">Nombre completo</label>
+                <div class="input-group"><input id="nombre_completo" name="nombre_completo" type="text" autocomplete="name" placeholder="Ej. Ana Pérez" required minlength="2"></div>
+                <small class="field-help" id="nombre-help">Ingresa tu nombre y apellido.</small>
+                <label for="telefono">Teléfono o celular</label>
+                <div class="input-group"><input id="telefono" name="telefono" type="tel" autocomplete="tel" placeholder="Ej. +591 70000000" required></div>
+                <small class="field-help" id="telefono-help">Usaremos este número solo para contactarte sobre pedidos.</small>
+                <label for="correo">Correo electrónico</label>
+                <div class="input-group"><input id="correo" name="correo" type="email" autocomplete="email" placeholder="tu@email.com" required></div>
+                <small class="field-help" id="correo-help">Usa un correo válido, por ejemplo nombre@correo.com.</small>
+                <label for="reg-password">Contraseña</label>
                 <div class="input-group">
-                    <input type="text" name="nombre_completo" placeholder="Tu nombre" required>
+                    <input id="reg-password" name="password" type="password" autocomplete="new-password" placeholder="Crea una contraseña segura" required>
+                    <button type="button" class="eye-icon-btn" data-toggle="reg-password" aria-label="Mostrar contraseña">👁</button>
                 </div>
-
-                <label>Teléfono/Celular</label>
+                <ul class="password-rules" aria-live="polite">
+                    <li data-rule="length">Al menos 8 caracteres</li>
+                    <li data-rule="upper">Una letra mayúscula</li>
+                    <li data-rule="lower">Una letra minúscula</li>
+                    <li data-rule="number">Un número</li>
+                    <li data-rule="symbol">Un símbolo, por ejemplo: @ # $ %</li>
+                </ul>
+                <label for="reg-confirm">Confirmar contraseña</label>
                 <div class="input-group">
-                    <input type="text" name="telefono" placeholder="+591 ..." required>
+                    <input id="reg-confirm" name="confirm_password" type="password" autocomplete="new-password" placeholder="Repite tu contraseña" required>
+                    <button type="button" class="eye-icon-btn" data-toggle="reg-confirm" aria-label="Mostrar contraseña">👁</button>
                 </div>
-
-                <label>Correo electrónico</label>
-                <div class="input-group">
-                    <input type="email" name="correo" placeholder="tu@email.com" required>
-                </div>
-
-                <label>Contraseña</label>
-                <div class="input-group">
-                    <!-- Su id es "reg-password" -->
-                    <input type="password" id="reg-password" name="password" placeholder="••••••••" required>
-                    <button type="button" class="eye-icon-btn" onclick="togglePassword('reg-password', this)" title="Mostrar/Ocultar contraseña">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
-                    </button>
-                </div>
-                <label>Confirmar contraseña</label>
-                <div class="input-group">
-                    <!-- Su id es "reg-confirm" -->
-                    <input type="password" id="reg-confirm" name="confirm_password" placeholder="••••••••" required>
-                    <button type="button" class="eye-icon-btn" onclick="togglePassword('reg-confirm', this)" title="Mostrar/Ocultar contraseña">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
-                    </button>
-                </div>
-
-                <button type="submit" class="btn">
-                    Crear Cuenta
-                </button>
+                <small class="field-help" id="confirm-help">Debe coincidir con la contraseña anterior.</small>
+                <button type="submit" class="btn" id="submit-registration">Crear cuenta segura</button>
             </form>
-        </div>
-    </div>
-
+            <p class="registration-login">¿Ya tienes cuenta? <a href="/login">Inicia sesión</a></p>
+        </section>
+    </main>
     <script>
-        const svgOjo = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>`;
-        const svgOjoTachado = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`;
-
-        function togglePassword(inputId, button)
-        {
-            const input = document.getElementById(inputId);
-            if (input.type === 'password')
-            {
-                input.type = 'text';
-                button.innerHTML = svgOjoTachado;
-            } else {
-                input.type = 'password';
-                button.innerHTML = svgOjo;
-            }
+        const form = document.getElementById('register-form');
+        const fields = ['nombre_completo', 'telefono', 'correo'];
+        const password = document.getElementById('reg-password');
+        const confirmPassword = document.getElementById('reg-confirm');
+        const rules = {
+            length: value => value.length >= 8, upper: value => /[A-Z]/.test(value),
+            lower: value => /[a-z]/.test(value), number: value => /\d/.test(value),
+            symbol: value => /[^A-Za-z0-9]/.test(value)
+        };
+        function setFieldState(input, valid, message) {
+            input.classList.toggle('field-valid', valid && input.value.length > 0);
+            input.classList.toggle('field-invalid', !valid && input.value.length > 0);
+            const help = document.getElementById(input.id + '-help');
+            if (help && input.value.length) help.textContent = message;
         }
+        function validateBasic(input) {
+            if (input.id === 'nombre_completo') setFieldState(input, input.value.trim().length >= 2, 'Escribe al menos 2 caracteres.');
+            if (input.id === 'telefono') setFieldState(input, /^[+\d\s()-]{7,20}$/.test(input.value), 'Ingresa un teléfono válido (mínimo 7 dígitos).');
+            if (input.id === 'correo') setFieldState(input, /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value), 'Ingresa un correo electrónico válido.');
+        }
+        function validatePasswords() {
+            Object.entries(rules).forEach(([name, test]) => document.querySelector('[data-rule="' + name + '"]').classList.toggle('rule-ok', test(password.value)));
+            const strong = Object.values(rules).every(test => test(password.value));
+            password.classList.toggle('field-valid', strong && password.value.length > 0);
+            password.classList.toggle('field-invalid', !strong && password.value.length > 0);
+            const same = confirmPassword.value === password.value && confirmPassword.value.length > 0;
+            confirmPassword.classList.toggle('field-valid', same);
+            confirmPassword.classList.toggle('field-invalid', confirmPassword.value.length > 0 && !same);
+            document.getElementById('confirm-help').textContent = confirmPassword.value && !same ? 'Las contraseñas no coinciden.' : 'Debe coincidir con la contraseña anterior.';
+            return strong && same;
+        }
+        fields.forEach(id => document.getElementById(id).addEventListener('input', event => validateBasic(event.target)));
+        password.addEventListener('input', validatePasswords);
+        confirmPassword.addEventListener('input', validatePasswords);
+        document.querySelectorAll('[data-toggle]').forEach(button => button.addEventListener('click', () => {
+            const input = document.getElementById(button.dataset.toggle);
+            input.type = input.type === 'password' ? 'text' : 'password';
+            button.textContent = input.type === 'password' ? '👁' : '🙈';
+        }));
+        form.addEventListener('submit', event => {
+            fields.forEach(id => validateBasic(document.getElementById(id)));
+            const basicsOk = fields.every(id => document.getElementById(id).checkValidity());
+            if (!basicsOk || !validatePasswords()) { event.preventDefault(); document.querySelector('.field-invalid, :invalid')?.focus(); }
+        });
     </script>
 </body>
 </html>

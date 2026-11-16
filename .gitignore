@@ -6,9 +6,15 @@ __pycache__/
 dist/
 build/
 *.egg
+.env
 
 # ===== Archivos de logs =====
 *.log
+app.log
+
+# ===== Herramientas locales =====
+ngrok.exe
+*.exe
 
 # ===== Base de datos local =====
 # (No subir la BD con datos reales de prueba)
